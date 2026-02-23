@@ -25,6 +25,10 @@
             color: white;
             border-color: #1e293b;
         }
+
+        /* Fallback si falla Tailwind */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -375,7 +379,7 @@
     </footer>
 
     <script>
-        // Función de Filtrado
+        // Función de Filtrado mejorada
         function filterTable(category) {
             const rows = document.querySelectorAll('.activity-row');
             const btns = document.querySelectorAll('.filter-btn');
@@ -403,42 +407,66 @@
             noResults.style.display = found ? 'none' : 'block';
         }
 
-        window.onload = function() {
-            const ctxAct = document.getElementById('operativaChart').getContext('2d');
-            new Chart(ctxAct, {
-                type: 'doughnut',
-                data: {
-                    labels: [
-                        'VACUNACIÓN', 
-                        'CONTROL DE VECTORES', 
-                        'VIGILANCIA EPIDEMIOLÓGICA', 
-                        'PROMOCIÓN A LA SALUD', 
-                        'ZOONOSIS'
-                    ],
-                    datasets: [{
-                        data: [4645, 1369, 1107, 167, 200],
-                        backgroundColor: ['#f37021', '#00a6da', '#1e293b', '#10b981', '#a855f7'],
-                        borderWidth: 0,
-                        hoverOffset: 25
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '72%',
-                    plugins: {
-                        legend: { 
-                            position: 'bottom', 
-                            labels: { 
-                                padding: 25, 
-                                font: { weight: 'bold', size: 9 },
-                                usePointStyle: true
-                            } 
+        // Inicializar gráfico con manejo de errores
+        function initChart() {
+            try {
+                const chartElement = document.getElementById('operativaChart');
+                if (!chartElement) {
+                    console.error('Canvas elemento no encontrado');
+                    return;
+                }
+
+                const ctxAct = chartElement.getContext('2d');
+                if (!ctxAct) {
+                    console.error('No se puede obtener contexto 2D del canvas');
+                    return;
+                }
+
+                new Chart(ctxAct, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            'VACUNACIÓN', 
+                            'CONTROL DE VECTORES', 
+                            'VIGILANCIA EPIDEMIOLÓGICA', 
+                            'PROMOCIÓN A LA SALUD', 
+                            'ZOONOSIS'
+                        ],
+                        datasets: [{
+                            data: [4645, 1369, 1107, 167, 200],
+                            backgroundColor: ['#f37021', '#00a6da', '#1e293b', '#10b981', '#a855f7'],
+                            borderWidth: 0,
+                            hoverOffset: 25
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '72%',
+                        plugins: {
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { 
+                                    padding: 25, 
+                                    font: { weight: 'bold', size: 9 },
+                                    usePointStyle: true
+                                } 
+                            }
                         }
                     }
-                }
-            });
-        };
+                });
+            } catch (error) {
+                console.error('Error al inicializar el gráfico:', error);
+                document.getElementById('operativaChart').style.backgroundColor = '#f1f5f9';
+            }
+        }
+
+        // Esperar a que DOM esté completamente cargado
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initChart);
+        } else {
+            initChart();
+        }
     </script>
 </body>
 </html>
